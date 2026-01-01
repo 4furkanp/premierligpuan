@@ -3,32 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <title>Premier League Puan Durumu</title>
+<style>
+body { font-family: Arial; background:#f4f4f4; }
+table { width:80%; margin:20px auto; border-collapse:collapse; background:#fff; }
+th,td { border:1px solid #ddd; padding:8px; text-align:center; }
+th { background:#003399; color:#fff; }
+</style>
 </head>
 <body>
 
-<h2>Premier League Puan Durumu</h2>
-<pre id="out">Yükleniyor...</pre>
+<h2 style="text-align:center;">Premier League (API Current Season)</h2>
+
+<table>
+<thead>
+<tr>
+<th>Sıra</th><th>Takım</th><th>O</th><th>G</th><th>B</th><th>M</th><th>P</th>
+</tr>
+</thead>
+<tbody id="puan"></tbody>
+</table>
 
 <script>
-const API_KEY = "201782961f2a4ff9a727ccfacad361e9";
-
-// CORS proxy
-const url =
-  "https://api.allorigins.win/raw?url=" +
-  encodeURIComponent("https://api.football-data.org/v4/competitions/PL/standings");
-
-fetch(url, {
+fetch("https://api.football-data.org/v4/competitions/PL/standings", {
   headers: {
-    "X-Auth-Token": API_KEY
+    "X-Auth-Token": "201782961f2a4ff9a727ccfacad361e9"
   }
 })
 .then(r => r.json())
 .then(d => {
-  document.getElementById("out").textContent =
-    JSON.stringify(d.standings[0].table, null, 2);
-})
-.catch(e => {
-  document.getElementById("out").textContent = "HATA: " + e;
+  const table = d.standings.find(s => s.type === "TOTAL").table;
+
+  document.getElementById("puan").innerHTML = table.map(t => `
+    <tr>
+      <td>${t.position}</td>
+      <td>${t.team.name}</td>
+      <td>${t.playedGames}</td>
+      <td>${t.won}</td>
+      <td>${t.draw}</td>
+      <td>${t.lost}</td>
+      <td>${t.points}</td>
+    </tr>
+  `).join("");
 });
 </script>
 
